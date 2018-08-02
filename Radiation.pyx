@@ -167,6 +167,12 @@ cdef class Radiation:
 
         # self.bl = MixedLayerModel.boundary_layer_profiles(namelist)
 
+        self.toa_lw_up = 0.0
+        self.toa_lw_down = 0.0
+        self.toa_lw_up_clear = 0.0
+        self.toa_lw_down_clear = 0.0
+
+
         return
 
     cpdef initialize(self, MixedLayerModel.MixedLayerModel mlm, NetCDFIO_Stats NS):
@@ -174,8 +180,23 @@ cdef class Radiation:
         self.heating_rate = np.zeros((mlm.nz,), dtype=np.double)
         self.net_lw_flux = np.zeros((mlm.nz,), dtype=np.double)
 
+        self.uflux_lw = np.zeros((mlm.nz,), dtype=np.double)
+        self.dflux_lw = np.zeros((mlm.nz,), dtype=np.double)
+        self.uflux_lw_clear = np.zeros((mlm.nz,), dtype=np.double)
+        self.dflux_lw_clear = np.zeros((mlm.nz,), dtype=np.double)
+
         NS.add_profile('net_lw_flux')
         NS.add_profile('radiative_heating_rate')
+
+        NS.add_profile('lw_flux_up')
+        NS.add_profile('lw_flux_down')
+        NS.add_profile('lw_flux_up_clear')
+        NS.add_profile('lw_flux_down_clear')
+
+        NS.add_ts('toa_lw_flux_up_clear')
+        NS.add_ts('toa_lw_flux_down_clear')
+        NS.add_ts('toa_lw_flux_up')
+        NS.add_ts('toa_lw_flux_down')
 
         return
 
@@ -595,6 +616,15 @@ cdef class Radiation:
         for k in xrange(nz):
             self.heating_rate[k] = (hr_lw_out[k] + hr_sw_out[k]) * mlm.rho[k] * cpd/86400.0
             self.net_lw_flux[k] = uflx_lw_out[k] - dflx_lw_out[k]
+            self.uflux_lw[k] = uflx_lw_out[k]
+            self.dflux_lw[k] = dflx_lw_out[k]
+            self.uflux_lw_clear[k] = uflxc_lw_out[k]
+            self.dflux_lw_clear[k] = dflxc_lw_out[k]
+
+        self.toa_lw_up = uflx_lw_out[nz_full]
+        self.toa_lw_up_clear = uflxc_lw_out[nz_full]
+        self.toa_lw_down = dflx_lw_out[nz_full]
+        self.toa_lw_down_clear = dflxc_lw_out[nz_full]
 
         # plt.figure(6)
         # plt.subplot(121)
@@ -621,6 +651,16 @@ cdef class Radiation:
 
         NS.write_profile('net_lw_flux', self.net_lw_flux)
         NS.write_profile('radiative_heating_rate', self.heating_rate)
+
+        NS.write_profile('lw_flux_up', self.uflux_lw)
+        NS.write_profile('lw_flux_down', self.dflux_lw)
+        NS.write_profile('lw_flux_up_clear', self.uflux_lw_clear)
+        NS.write_profile('lw_flux_down_clear', self.dflux_lw_clear)
+
+        NS.write_ts('toa_lw_flux_up', self.toa_lw_up)
+        NS.write_ts('toa_lw_flux_down', self.toa_lw_down)
+        NS.write_ts('toa_lw_flux_up_clear', self.toa_lw_up_clear)
+        NS.write_ts('toa_lw_flux_down_clear', self.toa_lw_down_clear)
 
         return
 

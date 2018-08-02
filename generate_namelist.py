@@ -58,7 +58,7 @@ def Isdac():
     namelist['stats_io']['output_root'] = '/Users/xiyue/Clouds/mlm/output/data/'
 
     namelist['meta'] = {}
-    namelist['meta']['simname'] = 'IsdacMLM_dz5'
+    namelist['meta']['simname'] = 'IsdacMLM_final'
     namelist['meta']['casename'] = 'IsdacMLM'
 
     return namelist

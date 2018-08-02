@@ -60,6 +60,16 @@ cdef class Radiation:
         double [:] ccl4vmr
         double IsdacCC_dT
 
+        double [:] uflux_lw
+        double [:] dflux_lw
+        double [:] uflux_lw_clear
+        double [:] dflux_lw_clear
+
+        double toa_lw_up
+        double toa_lw_down
+        double toa_lw_up_clear
+        double toa_lw_down_clear
+
 
     cpdef initialize(self, MixedLayerModel.MixedLayerModel mlm, NetCDFIO_Stats NS)
     cpdef initialize_profiles(self, MixedLayerModel.MixedLayerModel mlm)
