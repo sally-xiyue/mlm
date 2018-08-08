@@ -39,7 +39,8 @@ def Isdac():
     namelist['grid']['dz'] = 5.0
 
     namelist['entrainment'] = {}
-    namelist['entrainment']['efficiency'] = 0.7
+    namelist['entrainment']['a'] = 0.86
+    namelist['entrainment']['w0'] = 0.0002
 
     namelist['radiation'] = {}
     namelist['radiation']['frequency'] = 300.0
@@ -58,7 +59,7 @@ def Isdac():
     namelist['stats_io']['output_root'] = '/Users/xiyue/Clouds/mlm/output/data/'
 
     namelist['meta'] = {}
-    namelist['meta']['simname'] = 'IsdacMLM_final'
+    namelist['meta']['simname'] = 'IsdacMLM_rh'
     namelist['meta']['casename'] = 'IsdacMLM'
 
     return namelist

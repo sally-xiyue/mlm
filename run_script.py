@@ -6,7 +6,7 @@ def main():
     # schemes = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     dTis = [3, 5, 7, 9]
     dSSTs = [-4, 0, 4, 8]
-    rhs = [60, 70]
+    rhs = [70]
 
     for dTi in dTis:
         for dSST in dSSTs:

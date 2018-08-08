@@ -165,6 +165,12 @@ cdef class Radiation:
         except:
             self.IsdacCC_dT = 0.0
 
+
+        try:
+            self.IsdacCC_dHf = namelist['initial']['rh'] - 0.6
+        except:
+            self.IsdacCC_dHf = 0.0
+
         # self.bl = MixedLayerModel.boundary_layer_profiles(namelist)
 
         self.toa_lw_up = 0.0
@@ -235,7 +241,7 @@ cdef class Radiation:
         cdef Py_ssize_t count = 0
         for k in xrange(len(pressures)-n_profile, len(pressures)):
             self.p_ext[self.n_buffer+count] = pressures[k]
-            qt_new = get_humidity(temperatures[k], specific_humidity[k], pressures[k], temperatures[k]+self.IsdacCC_dT)
+            qt_new = get_humidity(temperatures[k], specific_humidity[k], pressures[k], temperatures[k]+self.IsdacCC_dT, self.IsdacCC_dHf)
             self.t_ext[self.n_buffer+count] = temperatures[k] + self.IsdacCC_dT
             self.rv_ext[self.n_buffer+count] = qt_new / (1.0 - qt_new)
             count += 1
@@ -664,10 +670,12 @@ cdef class Radiation:
 
         return
 
-def get_humidity(temperature_old, qt_old, pressure, temperature_new):
+def get_humidity(temperature_old, qt_old, pressure, temperature_new, drh):
     pv_star_1 = saturation_vapor_pressure(temperature_old)
     pv_1 = (pressure * qt_old) / (eps_v * (1.0 - qt_old) + qt_old)
-    rh_ = pv_1 / pv_star_1
+    rh_ = pv_1 / pv_star_1 + drh
+    if rh_ > 1.0:
+        rh_ = 1.0
     pv_star_2 = saturation_vapor_pressure(temperature_new)
     pv_2 = rh_ * pv_star_2
     qt_new = 1.0/(eps_vi * (pressure - pv_2)/pv_2 + 1.0)

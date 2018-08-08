@@ -59,6 +59,7 @@ cdef class Radiation:
         double [:] cfc22vmr
         double [:] ccl4vmr
         double IsdacCC_dT
+        double IsdacCC_dHf
 
         double [:] uflux_lw
         double [:] dflux_lw

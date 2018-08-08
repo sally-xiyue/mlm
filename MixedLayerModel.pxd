@@ -30,7 +30,8 @@ cdef class MixedLayerModel:
         double [:] rho
         double [:] values
         double [:] tendencies
-        double efficiency
+        double a
+        double w0
         double dz_inv
         double thetal_inv
 

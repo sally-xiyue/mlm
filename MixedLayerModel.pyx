@@ -62,11 +62,16 @@ cdef class MixedLayerModel:
         except:
             self.div_frac = 1.0
 
-        #Entrainment efficiency (not needed in Moeng parameterization)
+        #Entrainment parameters
         try:
-            self.efficiency = namelist['entrainment']['efficiency']
+            self.a = namelist['entrainment']['efficiency']
         except:
-            self.efficiency = 0.7
+            self.a = 0.86
+
+        try:
+            self.w0 = namelist['entrainment']['w0']
+        except:
+            self.w0 = 0.0002
 
         #Vertical grid resolution (matters for radiation and cloud top inversion)
         try:
@@ -287,7 +292,7 @@ cdef class MixedLayerModel:
 
         B_mean = 6.63e-3 #BL-mean buoyancy flux
         # w_e = entrainment_moeng(B_mean, dthetal, dfrad, self.rho[idx])
-        w_e = entrainment_rate(0.85, dfrad, dthetal, self.rho[idx]) #2.24
+        w_e = entrainment_rate(self.a, self.w0, dfrad, dthetal, self.rho[idx]) #2.24
 
         w_ls = get_ls_subsidence(self.z, self.zi_i, self.div_frac)[idx]
         # print(w_ls, w_e)
@@ -349,11 +354,11 @@ cdef class MixedLayerModel:
         return
 
 
-cdef double entrainment_rate(double efficiency, double dfrad, double dthetal, double rho):
+cdef double entrainment_rate(double efficiency, double w0, double dfrad, double dthetal, double rho):
     cdef:
         w_e
 
-    w_e = efficiency * dfrad / cpd / rho / dthetal + 0.0004
+    w_e = efficiency * dfrad / cpd / rho / dthetal + w0
     return w_e
 
 cdef double entrainment_moeng(double B, double dthetal, double dfrad, double rho):
